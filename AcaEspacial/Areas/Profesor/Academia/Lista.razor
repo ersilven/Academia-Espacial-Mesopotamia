@@ -1,0 +1,63 @@
+﻿@page "/Profesor/Academia/Lista"
+@using AcaEspacial.Models
+@using AcaEspacial.Data
+@using Microsoft.AspNetCore.Mvc
+@using Microsoft.EntityFrameworkCore
+@inject AcademiaContext Db
+@inject IHttpContextAccessor httpContextAccessor
+@using System.Security.Claims
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles ="Usuario,Profesor,Administrador")]
+
+
+<table class="table is-fullwidth">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Numero de telefono</th>
+            <th>Codigo de la Academia</th>
+            <th>Nucleos Acádemicos</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var academias in listaAcademias)
+        {
+            <tr>
+                <td>@academias.Nombre</td>
+                <td>@academias.Correo</td>
+                <td>@academias.NumeroTlfono</td>
+                <td>@academias.CodigoAcademia</td>
+                <td>
+                    @string.Join(",",academias.AcademiaArea.Select(x=>x.IDAreaNavigation.Nombre))
+                </td>
+           </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    private List<Academias> listaAcademias = new();
+
+    private List<Guid> luser = new();
+
+    private Guid UserID = new();
+
+ 
+    protected override void OnInitialized()
+    {
+        if (httpContextAccessor.HttpContext != null)
+        {
+            UserID = Guid.Parse(httpContextAccessor.HttpContext.User.FindFirstValue(claimType: "IdUsuario"));
+
+            listaAcademias = Db.Academias.Include(x => x.AcademiaArea).ThenInclude(x => x.IDAreaNavigation)
+            .Select(x => x).ToList();
+        }
+
+        base.OnInitialized();
+    }
+
+
+}
+

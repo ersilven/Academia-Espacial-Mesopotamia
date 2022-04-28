@@ -1,0 +1,29 @@
+﻿@using Microsoft.EntityFrameworkCore
+@using Microsoft.Extensions.Logging
+@inject IHttpContextAccessor httpContextAccessor
+@inject NavigationManager NavManager
+
+
+<section class="section is-medium">
+    <div class="container">
+        <div class="columns is-vcentered">
+            <div class="column has-text-centered">
+                <h1 class="title">Página no Encontrada</h1>
+                <p class="subtitle">Por favor contactar al equipo de Tecnología</p>
+            </div>
+            <div class="column has-text-centered">
+                <img src="img/404.png" />
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private Guid UserID = new();
+
+    protected override void OnInitialized()
+    {
+     
+    }
+
+ }

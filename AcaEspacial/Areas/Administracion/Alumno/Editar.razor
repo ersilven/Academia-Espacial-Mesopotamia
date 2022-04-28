@@ -1,0 +1,196 @@
+﻿@page "/Administracion/Alumno/Editar/{Id:guid}"
+@using AcaEspacial.Data
+@using AcaEspacial.Models
+@using AcaEspacial.Models.Administracion.Custom
+@using AcaEspacial.Models.Custom
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims
+@using AcaEspacial.Servicios
+@using Microsoft.Extensions.Logging
+@inject AcademiaContext Db
+@inject IHttpContextAccessor httpContextAccessor
+@inject NavigationManager NavManager
+@attribute [Authorize(Roles ="Administrador")]
+
+
+<EditForm Model="@DataUser" OnValidSubmit="@Modificar">
+    <DataAnnotationsValidator />
+    <div class="field-body">
+        <div class="field">
+            <label class="label">Nombre</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataUser.Nombre />
+                <ValidationMessage For="@(()=>DataUser.Nombre)" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Apellido</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataUser.Apellido />
+                <ValidationMessage For="@(()=>DataUser.Apellido)" />
+            </div>
+        </div>
+        <div class="field">
+            <label class="label">Correo</label>
+            <div class="control">
+                <input class="input" type="email" @bind-value=DataUser.Correo />
+                <ValidationMessage For="@(()=>DataUser.Correo)" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Nombre de usuario</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataUser.Username />
+                <ValidationMessage For="@(()=>DataUser.Username)" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Contraseña de usuario</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataPass.Pass />
+            </div>
+        </div>
+
+
+    </div>
+    <div class="field">
+        <label class="label">Areas de Estudio</label>
+        <div class="control">
+            <div class="field">
+
+                @foreach (var lr in listaAreas)
+                {
+                    var r = DataUser.AlumnoArea.FirstOrDefault(x => x.IDArea.Equals(lr.IDArea));
+                    if (r != null)
+                    {
+                        <input id="@lr.Nombre" @onchange="@((ChangeEventArgs __e)=>areaClase(@lr.IDArea))" type="checkbox" name="@lr.Nombre" class="switch" checked="checked">
+                        <label for="@lr.Nombre">@lr.Nombre</label>
+
+                    }
+                    else
+                    {
+                        <input id="@lr.Nombre" @onchange="@((ChangeEventArgs __e)=>areaClase(@lr.IDArea))" type="checkbox" name="@lr.Nombre" class="switch">
+                        <label for="@lr.Nombre">@lr.Nombre</label>
+                    }
+
+                }
+            </div>
+
+        </div>
+    </div>
+    <div class="control" style="margin-top: 1%">
+        <button class="button is-primary" type="submit">Editar</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private readonly PaswordHasher ps = new PaswordHasher();
+
+    private Guid UserID = new();
+
+    private List<AreaClase> listaAreas = new List<AreaClase>();
+
+    private List<Guid> areass = new();
+
+    private Usuario DataUser = new();
+
+    private UsuarioPass DataPass = new();
+
+
+    protected override void OnInitialized()
+    {
+        if (httpContextAccessor.HttpContext != null)
+        {
+            UserID = Guid.Parse(httpContextAccessor.HttpContext.User.FindFirstValue(claimType: "IdUsuario"));
+            DataUser = Db.Usuario.Include(x => x.UsuarioEstatus).ThenInclude(x => x.IDEstatusNavigation)
+    .Include(x => x.UsuarioRoles).ThenInclude(x => x.IDRolNavigation).Include(x => x.UsuarioPass)
+    .Include(x=> x.AlumnoArea).ThenInclude(x=> x.IDAreaNavigation)
+    .FirstOrDefault(x => x.IDUsuario.Equals(Id));
+
+            listaAreas = Db.AreaClase.OrderBy(x => x.Nombre).ToList();
+
+            DataPass = DataUser.UsuarioPass.FirstOrDefault(x => x.IDUsuario.Equals(Id));
+
+            foreach (var f in DataUser.AlumnoArea)
+            {
+                if (f.IDAreaNavigation.Nombre != null)
+                {
+                    areass.Add(f.IDArea);
+                }
+            }
+        }
+
+        base.OnInitialized();
+    }
+
+    private void Modificar()
+    {
+        DataUser.ModifiedBy = UserID;
+        DataUser.ModifiedOn = DateTime.Now;
+        Db.Usuario.Update(DataUser);
+
+         if (DataPass.Pass != null)
+        {
+            DataPass.ModifiedBy = UserID;
+            DataPass.ModifiedOn = DateTime.Now;
+            Db.UsuarioPass.Update(DataPass);
+            Db.SaveChanges();
+        }
+        else
+        {
+            DataPass.Pass = ps.HashPassword(DataPass.Pass);
+            DataPass.ModifiedBy = UserID;
+            DataPass.ModifiedOn = DateTime.Now;
+            Db.UsuarioPass.Update(DataPass);
+            Db.SaveChanges();
+        }
+
+
+        Db.AlumnoArea.RemoveRange(DataUser.AlumnoArea);
+        Db.SaveChanges();
+
+        foreach (var r in areass)
+        {
+
+            Db.AlumnoArea.Add(new AlumnoArea()
+                {
+                    IDUsuario = Id,
+                    IDArea = r,
+                    CreatedOn = DateTime.Now,
+                    CreatedBy = UserID,
+                    ModifiedBy = UserID,
+                    ModifiedOn = DateTime.Now
+
+                });
+            Db.SaveChanges();
+
+        }
+
+        NavManager.NavigateTo("/Administracion/Alumno/Lista");
+
+    }
+
+
+    private void areaClase(Guid id)
+    {
+
+        if (areass.Contains(id))
+        {
+            areass.Remove(id);
+        }
+        else
+        {
+            areass.Add(id);
+        }
+
+
+        StateHasChanged();
+    }
+}
+

@@ -1,0 +1,219 @@
+﻿@page "/Administracion/Usuario/Crear"
+@using AcaEspacial.Data
+@using AcaEspacial.Models
+@using AcaEspacial.Models.Administracion.Custom
+@using AcaEspacial.Models.Custom
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims
+@using Microsoft.Extensions.Logging
+@using AcaEspacial.Servicios
+@inject AcademiaContext Db
+@inject IHttpContextAccessor httpContextAccessor
+@inject NavigationManager NavManager
+@attribute [Authorize(Roles ="Administrador")]
+
+@if (hide == true)
+{
+    <div class="notification is-danger">
+        @Error
+    </div>
+}
+
+@if (hideError == true)
+{
+    <div class="notification is-success">
+        @Error
+    </div>
+}
+
+<EditForm Model="@DataUser" OnValidSubmit="@Ingresar">
+    <DataAnnotationsValidator />
+    <div class="field-body">
+        <div class="field">
+            <label class="label">Nombre</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataUser.Nombre />
+                <ValidationMessage For="@(()=>DataUser.Nombre)" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Apellido</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataUser.Apellido />
+                <ValidationMessage For="@(()=>DataUser.Apellido)" />
+            </div>
+        </div>
+
+         <div class="field">
+            <label class="label">Edad</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataUser.Edad placeholder="Edad" />
+                <ValidationMessage For="@(()=>DataUser.Edad)" />
+            </div>
+        </div>
+
+         <div class="field">
+            <label class="label">Numero de Telefono</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataUser.NumeroTelefono placeholder="Numero de Telefono" />
+                <ValidationMessage For="@(()=>DataUser.NumeroTelefono)" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Correo</label>
+            <div class="control">
+                <input class="input" type="email" @bind-value=DataUser.Email placeholder="correo@correo.com" />
+                <ValidationMessage For="@(()=>DataUser.Email)" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Nombre de usuario </label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataUser.UserName placeholder="UserName" />
+                <ValidationMessage For="@(()=>DataUser.UserName)" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Contraseña de usuario</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataUser.Constraseña />
+             </div>
+        </div>
+
+    </div>
+    <div class="field">
+        <label class="label">Roles</label>
+        <div class="control">
+            <div class="field">
+                @foreach (var ListRol in listaRoles)
+                {
+
+                    <input id="@ListRol.Nombre" @onchange="@((ChangeEventArgs __e)=>Role(@ListRol.IDRol))" type="checkbox" name="@ListRol.Nombre" class="switch">
+                    <label for="@ListRol.Nombre">@ListRol.Nombre</label>
+
+                }
+            </div>
+            <ValidationMessage For="@(()=>DataUser.Nombre)" />
+        </div>
+    </div>
+    <div class="control" style="margin-top: 1%">
+        <button class="button is-primary" type="submit">Crear</button>
+    </div>
+</EditForm>
+
+
+@code {
+    private Guid UserID = new();
+
+    private List<Roles> listaRoles = new List<Roles>();
+
+    private readonly PaswordHasher ps = new PaswordHasher();
+
+    private CrearUsr DataUser = new();
+
+    private string Error = null;
+
+    private bool hide = false;
+
+    private bool hideError = false;
+
+    private UsuarioPass DataPass = new();
+
+    public List<Guid> roles = new();
+
+    protected override void OnInitialized()
+    {
+        if (httpContextAccessor.HttpContext != null)
+        {
+            UserID = Guid.Parse(httpContextAccessor.HttpContext.User.FindFirstValue(claimType: "IdUsuario"));
+            listaRoles = Db.Roles.OrderBy(x => x.Nombre).ToList();
+        }
+        base.OnInitialized();
+    }
+
+
+    private void Ingresar()
+    {
+        var usd = Db.Usuario.FirstOrDefault(x => x.Username.ToLower().Equals(DataUser.UserName.ToLower())
+        || x.Correo.ToLower().Equals(DataUser.Email.ToLower()));
+
+        if (usd == null)
+        {
+
+            Guid _NewUserID = Guid.NewGuid();
+            Guid _NewPassID = Guid.NewGuid();
+
+            Db.Usuario.Add(new Usuario()
+                {
+                    IDUsuario = _NewUserID,
+                    Nombre = DataUser.Nombre,
+                    Apellido = DataUser.Apellido,
+                    Correo = DataUser.Email,
+                    Username = DataUser.UserName,
+                    Edad = DataUser.Edad,
+                    NumeroTelefono = DataUser.NumeroTelefono,
+                    CreatedOn = DateTime.Now,
+                    CreatedBy = UserID,
+                    UsuarioEstatus = new List<UsuarioEstatus>{
+                    new UsuarioEstatus{
+                    IDEstatus = Db.Estatus.FirstOrDefault(x => x.Codigo.Equals(1000)).IDEstatus,
+                    CreatedOn = DateTime.Now,
+                    CreatedBy = UserID,
+
+            }}
+                });
+            Db.SaveChanges();
+
+            foreach (var r in roles)
+            {
+                Db.UsuarioRoles.Add(new UsuarioRoles()
+                    {
+                        IDUsuario = _NewUserID,
+                        IDRol = r,
+                        CreatedOn = DateTime.Now,
+                        CreatedBy = UserID
+
+                    });
+                Db.SaveChanges();
+            }
+
+            Db.UsuarioPass.Add(new UsuarioPass()
+                {
+                    IDUsuarioPass = _NewPassID,
+                    IDUsuario = _NewUserID,
+                    Pass = ps.HashPassword(DataUser.Constraseña),
+                    CreatedOn = DateTime.Now,
+                    CreatedBy = UserID
+
+                });
+            Db.SaveChanges();
+
+            Error = "Usuario creado Exitosamente";
+            hideError = true;
+            NavManager.NavigateTo("/Administracion/Usuario/Crear");
+        }
+        else
+        {
+            Error = "El usuario ya se encuentra registrado";
+            hide = true;
+        }
+    }
+
+    private void Role(Guid id)
+    {
+        if (roles.Contains(id))
+        {
+            roles.Remove(id);
+        }
+        else
+        {
+            roles.Add(id);
+        }
+        StateHasChanged();
+    }
+
+}

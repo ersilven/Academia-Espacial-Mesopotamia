@@ -1,0 +1,26 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@namespace AcaEspacial.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+    <link rel="stylesheet" href="lib/bulma/css/bulma.css" />
+    <link rel="stylesheet" href="lib/mdi/font/css/materialdesignicons.css" />
+    <link rel="stylesheet" href="lib/bulma-switch/dist/css/bulma-switch.min.css" />
+    <link rel="stylesheet" href="lib/bulma-calendar/dist/css/bulma-calendar.css" />
+    <Link rel="stylesheet" href="lib/croppie/croppie.min.css" />
+    <link rel="stylesheet" href="lib/creativebulma/bulma-collapsible/dist/css/bulma-collapsible.min.css" />
+    <link rel="stylesheet" href="lib/bulma-pageloader/dist/css/bulma-pageloader.min.css" />
+     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+</head>
+<body>
+    @RenderBody()
+
+    <script src="_framework/blazor.server.js"></script>
+    <script src="lib/bulma-calendar/dist/js/bulma-calendar.min.js"></script>
+</body>
+</html>

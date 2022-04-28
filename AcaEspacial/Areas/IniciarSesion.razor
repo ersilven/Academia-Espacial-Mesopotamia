@@ -1,0 +1,127 @@
+﻿@using Microsoft.AspNetCore.Http
+@using Blazored.FluentValidation
+@using System.Web
+@using AcaEspacial.Data
+@using AcaEspacial.Models.Custom
+@using AcaEspacial.Servicios
+@using Microsoft.AspNetCore.Components
+@using System.Security.Cryptography
+@using Microsoft.EntityFrameworkCore
+@inject AcademiaContext db
+@inject NavigationManager NavigationManager
+@inject IHttpContextAccessor httpContextAccesor
+
+<section class="hero is-fullheight">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-5-tablet is-4-desktop is-3-widescreen">
+                    <EditForm Model="loginModel" OnValidSubmit="@Iniciar">
+
+                        <FluentValidationValidator @ref="flv" />
+                        @if (hide == true)
+                        {
+                            <div class="notification is-warning">
+                                @ErrorInfo
+                            </div>
+                        }
+
+                        @if (hideError == true)
+                        {
+                            <div class="notification is-warning">
+                                @ErrorInfo
+                            </div>
+                        }
+
+                        <div class="field">
+                            <label for="" class="label">Nombre de Usuario</label>
+                            <div class="control has-icons-left">
+                                <input type="text" @bind-value="loginModel.Usuario" placeholder="Nombre de usuario" class="input" required>
+                                <span class="icon is-small is-left">
+                                    <i class="mdi-account-box mdi mdi"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="" class="label">Contraseña</label>
+                            <div class="control has-icons-left">
+                                <input type="password" @bind-value="loginModel.Password" placeholder="Contraseña" class="input" required>
+                                <span class="icon is-small is-left">
+                                    <i class="mdi-lock-outline mdi mdi"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <button type="submit" id="loginbutton" class="button is-success">
+                                Login
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+
+    private readonly PaswordHasher ps = new PaswordHasher();
+
+    private readonly SecurityEncrypt se = new SecurityEncrypt();
+
+    private FluentValidationValidator flv;
+
+    Login loginModel = new();
+
+    public string? ErrorInfo { get; set; }
+
+    private bool hide = false;
+
+    private bool hideError = false;
+
+    private void Iniciar()
+    {
+        //var cosa = ps.HashPassword("prueba123");
+        //var cosa = ps.HashPassword("master123");
+        //var cosa = ps.HashPassword("bloomcker123");
+        if (loginModel != null)
+        {
+
+            var l = db.Usuario.Include(x => x.UsuarioPass).
+            FirstOrDefault(x => x.Username.ToUpper().Equals(loginModel.Usuario.ToUpper()));
+            string contraseña = string.Empty;
+
+            l.UsuarioPass.ToList().ForEach(c =>
+            {
+                contraseña = c.Pass.ToString();
+            });
+
+            if (l is null)
+            {
+                ErrorInfo = "Usuario invalido, por pruebe con un usuario o correo válido";
+                hide = true;
+                StateHasChanged();
+            }
+            else if (ps.VerifyHashedPassword(contraseña, loginModel.Password))
+            {
+                using (Aes myAes = Aes.Create())
+                {
+                    var endoc = HttpUtility.UrlEncode(l.Username);
+                    var endocl = HttpUtility.UrlEncode(se.EncryptStringToBytes_Aes(loginModel.Password, myAes.Key, myAes.IV));
+                    var key = HttpUtility.UrlEncode(myAes.Key);
+                    var IV = HttpUtility.UrlEncode(myAes.IV);
+                    StateHasChanged();
+                    NavigationManager.NavigateTo($"/Sesion/LogIn?paramSesion={endoc}&paramClave={endocl}&paramKey={key}&paramIV={IV}",true);
+                }
+            }
+            else
+            {
+                ErrorInfo = "Contraseña incorrecta";
+                hideError = true;
+                StateHasChanged();
+            }
+
+        }
+    }
+
+}

@@ -1,0 +1,183 @@
+﻿@page "/Administracion/Usuario/Lista"
+@using AcaEspacial.Models
+@using AcaEspacial.Data
+@using Microsoft.AspNetCore.Mvc
+@using Microsoft.EntityFrameworkCore
+@inject AcademiaContext Db
+@inject IHttpContextAccessor httpContextAccessor
+@using System.Security.Claims
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles ="Administrador")]
+
+<div class="row">
+    <div class="col-6 text-right">
+        <a href="Administracion/Usuario/Crear" class="button is-primary">Crear Usario</a>
+    </div>
+</div>
+<br />
+
+<table class="table is-fullwidth">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Estatus</th>
+            <th>Rol</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var Usuario in listaUsuarios)
+        {
+            <tr>
+                <td>@Usuario.Nombre</td>
+                <td>@Usuario.Apellido</td>
+                <td>@Usuario.Username</td>
+                <td>@Usuario.Correo</td>
+                <td>
+                    @foreach (var e in Usuario.UsuarioEstatus)
+                    {
+                        @e.IDEstatusNavigation.Nombre
+                    }
+                </td>
+                <td>@string.Join(", ",Usuario.UsuarioRoles.Select(x=>x.IDRolNavigation.Nombre))</td>
+                <td>
+                    @if (luser.Contains(Usuario.IDUsuario))
+                    {
+                        <div class="dropdown is-active">
+                            <div class="dropdown-trigger">
+                                <button class="button" aria-haspopup="true" aria-controls="dropdown-menu" @onclick=@(e=>DropdownAcciones(@Usuario.IDUsuario))>
+                                    <span>Acciones</span>
+                                    <span class="icon is-small">
+                                        <i class="mdi mdi-chevron-down" aria-hidden="true"></i>
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                                <div class="dropdown-content">
+                                    <a class="dropdown-item" @onclick=@(e=> Editar(Usuario.IDUsuario))>
+                                        Editar
+                                    </a>
+                                    @foreach (var p in Usuario.UsuarioEstatus)
+                                    {
+                                        if (p.IDEstatusNavigation.Codigo == 1000)
+                                        {
+                                            <a class="dropdown-item" @onclick=@(e=> ModificarEstatus(Usuario.IDUsuario))>
+                                                Desactivar
+                                            </a>
+                                            <a class="dropdown-item" @onclick=@(e=> ModificarEstatus(Usuario.IDUsuario))>
+                                                Activar
+                                            </a>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="dropdown">
+                            <div class="dropdown-trigger">
+                                <button class="button" aria-haspopup="true" aria-controls="dropdown-menu" @onclick=@(e=>DropdownAcciones(@Usuario.IDUsuario))>
+                                    <span>Acciones</span>
+                                    <span class="icon is-small">
+                                        <i class="mdi mdi-chevron-down" aria-hidden="true"></i>
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                                <div class="dropdown-content">
+                                    <a class="dropdown-item" @onclick=@(e=> Editar(Usuario.IDUsuario))>
+                                        Editar
+                                    </a>
+                                    @foreach (var p in Usuario.UsuarioEstatus)
+                                    {
+                                        if (p.IDEstatusNavigation.Codigo == 1000)
+                                        {
+                                            <a class="dropdown-item" @onclick=@(e=> ModificarEstatus(Usuario.IDUsuario))>
+                                                Desactivar
+                                            </a>
+                                            <a class="dropdown-item" @onclick=@(e=> ModificarEstatus(Usuario.IDUsuario))>
+                                                Activar
+                                            </a>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </td>
+
+            </tr>
+
+        }
+
+    </tbody>
+</table>
+
+@code {
+
+    private List<Usuario> listaUsuarios = new();
+
+    private List<Guid> luser = new();
+
+    private Guid UserID = new();
+
+    private void Editar(Guid ID)
+    {
+        NavigationManager.NavigateTo($"/Administracion/Usuario/Editar/{ID}", true);
+    }
+
+    protected override void OnInitialized()
+    {
+        if (httpContextAccessor.HttpContext != null)
+        {
+            UserID = Guid.Parse(httpContextAccessor.HttpContext.User.FindFirstValue(claimType: "IdUsuario"));
+
+        listaUsuarios = Db.Usuario.Include(x => x.UsuarioEstatus).ThenInclude(x => x.IDEstatusNavigation)
+        .Include(x => x.UsuarioRoles).ThenInclude(x => x.IDRolNavigation)
+        .Select(x => x).ToList();
+        
+        }
+
+        base.OnInitialized();
+    }
+
+    private void ModificarEstatus(Guid Id)
+    {
+        var usd = Db.UsuarioEstatus.Include(x => x.IDEstatusNavigation).FirstOrDefault(x => x.IDUsuario.Equals(Id));
+        if (usd.IDEstatusNavigation.Codigo.Equals(1000))
+        {
+            usd.IDEstatus = Db.Estatus.FirstOrDefault(x => x.Codigo.Equals(2000)).IDEstatus;
+        }
+        else
+        {
+            usd.IDEstatus = Db.Estatus.FirstOrDefault(x => x.Codigo.Equals(1000)).IDEstatus;
+        }
+
+        usd.ModifiedBy = UserID;
+        usd.ModifiedOn = DateTime.Now;
+        Db.UsuarioEstatus.Update(usd);
+        Db.SaveChanges();
+
+        StateHasChanged();
+    }
+
+    private void DropdownAcciones(Guid id)
+    {
+        if (luser.Contains(id))
+        {
+            luser.Remove(id);
+            StateHasChanged();
+        }
+        else
+        {
+            luser.Add(id);
+            StateHasChanged();
+        }
+    }
+
+}
+

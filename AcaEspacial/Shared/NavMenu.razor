@@ -1,0 +1,90 @@
+﻿@inject NavigationManager NavigationManager
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="">
+            <img src="img/academialogo.jpg" alt="logoacademia">
+        </a>
+
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+
+    <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+
+            <AuthorizeView Roles="Usuario,Alumno,Profesor,Administrador">
+                <div id="navbarExample" class="navbar-brand">
+                    <div class="navbar-start">
+                        <div class="navbar-item has-dropdown is-hoverable">
+                            <a class="navbar-link" href="#">Usuario</a>
+                            <div class="navbar-dropdown is-boxed">
+                                <a class="navbar-item" href="/">Inicio</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </AuthorizeView>
+                <AuthorizeView Roles="Alumno,Administrador">
+                <div id="navbarExample" class="navbar-brand">
+                    <div class="navbar-start">
+                        <div class="navbar-item has-dropdown is-hoverable">
+                            <a class="navbar-link" href="#">Alumno</a>
+                            <div class="navbar-dropdown is-boxed">
+                                <a class="navbar-item" href="/Alumno/Academia/Lista">Facultad</a>
+                                <a class="navbar-item" href="/Alumno/AreaClase/Lista">Clases</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </AuthorizeView>
+            <AuthorizeView Roles="Profesor,Administrador">
+                <div id="navbarExample" class="navbar-brand">
+                    <div class="navbar-start">
+                        <div class="navbar-item has-dropdown is-hoverable">
+                            <a class="navbar-link" href="#">Profesor</a>
+                            <div class="navbar-dropdown is-boxed">
+                                <a class="navbar-item" href="/Profesor/Academia/Lista">Facultad</a>
+                                <a class="navbar-item" href="/Profesor/AreaClase/Lista">Clases</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </AuthorizeView>
+            <AuthorizeView Roles="Administrador">
+                <div id="navbarExample" class="navbar-brand">
+                    <div class="navbar-start">
+                        <div class="navbar-item has-dropdown is-hoverable">
+                            <a class="navbar-link" href="#">Administración</a>
+                            <div class="navbar-dropdown is-boxed">
+                                <a class="navbar-item" href="/Administracion/Usuario/Lista">Usuarios</a>
+                                <a class="navbar-item" href="/Administracion/Alumno/Lista">Alumnos</a>
+                                <a class="navbar-item" href="/Administracion/Academia/Lista">Facultad</a>
+                                <a class="navbar-item" href="/Administracion/AreaClase/Lista">Clases</a>
+                                <a class="navbar-item" href="/Administracion/Maestro/Lista">Maestros</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </AuthorizeView>
+        </div>
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                     <a class="button is-danger" href="/Sesion/LogOut">
+                        Log out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+@code {
+
+
+}

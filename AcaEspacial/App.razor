@@ -1,0 +1,24 @@
+﻿<LoadingScreen>
+    <CascadingAuthenticationState>
+        <Router AppAssembly="@typeof(App).Assembly">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                    <NotAuthorized>
+                         <AcaEspacial.Areas.IniciarSesion />
+                    </NotAuthorized>
+                    <Authorizing>
+                        <h1>Autorización en progreso</h1>
+                    </Authorizing>
+                </AuthorizeRouteView>
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </Found>
+            <NotFound>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <RutaDesconocida>
+                    </RutaDesconocida>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    </CascadingAuthenticationState>
+</LoadingScreen>
+

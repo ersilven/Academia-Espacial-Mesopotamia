@@ -1,0 +1,193 @@
+﻿@page "/Administracion/Usuario/Editar/{Id:guid}"
+@using AcaEspacial.Data
+@using AcaEspacial.Models
+@using AcaEspacial.Models.Administracion.Custom
+@using AcaEspacial.Models.Custom
+@using AcaEspacial.Servicios
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims
+@using Microsoft.Extensions.Logging
+@inject AcademiaContext Db
+@inject IHttpContextAccessor httpContextAccessor
+@inject NavigationManager NavManager
+@attribute [Authorize(Roles = "Administrador")]
+
+<EditForm Model="@DataUser" OnValidSubmit="@Modificar">
+    <DataAnnotationsValidator />
+    <div class="field-body">
+        <div class="field">
+            <label class="label">Nombre</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataUser.Nombre />
+                <ValidationMessage For="@(()=>DataUser.Nombre)" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Apellido</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataUser.Apellido />
+                <ValidationMessage For="@(()=>DataUser.Apellido)" />
+            </div>
+        </div>
+        <div class="field">
+            <label class="label">Correo</label>
+            <div class="control">
+                <input class="input" type="email" @bind-value=DataUser.Correo />
+                <ValidationMessage For="@(()=>DataUser.Correo)" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Nombre de usuario</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataUser.Username />
+                <ValidationMessage For="@(()=>DataUser.Username)" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Contraseña de usuario</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataPass.Pass />
+            </div>
+        </div>
+
+    </div>
+    <div class="field">
+        <label class="label">Roles</label>
+        <div class="control">
+            <div class="field">
+
+                @foreach (var lr in listaRoles)
+                {
+                    var r = DataUser.UsuarioRoles.FirstOrDefault(x => x.IDRol.Equals(lr.IDRol));
+                    if (r != null)
+                    {
+                        <input id="@lr.Nombre" @onchange="@((ChangeEventArgs __e)=>Role(@lr.IDRol))" type="checkbox" name="@lr.Nombre" class="switch" checked="checked">
+                        <label for="@lr.Nombre">@lr.Nombre</label>
+
+                    }
+                    else
+                    {
+                        <input id="@lr.Nombre" @onchange="@((ChangeEventArgs __e)=>Role(@lr.IDRol))" type="checkbox" name="@lr.Nombre" class="switch">
+                        <label for="@lr.Nombre">@lr.Nombre</label>
+                    }
+
+                }
+            </div>
+
+        </div>
+    </div>
+    <div class="control" style="margin-top: 1%">
+        <button class="button is-primary" type="submit">Editar</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private readonly PaswordHasher ps = new PaswordHasher();
+
+    private Guid UserID = new();
+
+    private List<Roles> listaRoles = new List<Roles>();
+
+    private List<Guid> roles = new();
+
+    private Usuario DataUser = new();
+
+    private UsuarioPass DataPass = new();
+
+
+    protected override void OnInitialized()
+    {
+        if (httpContextAccessor.HttpContext != null)
+        {
+            UserID = Guid.Parse(httpContextAccessor.HttpContext.User.FindFirstValue(claimType: "IdUsuario"));
+            DataUser = Db.Usuario.Include(x => x.UsuarioEstatus).ThenInclude(x => x.IDEstatusNavigation)
+            .Include(x => x.UsuarioRoles).ThenInclude(x => x.IDRolNavigation).Include(x => x.UsuarioPass)
+            .FirstOrDefault(x => x.IDUsuario.Equals(Id));
+
+            DataPass = DataUser.UsuarioPass.FirstOrDefault(x => x.IDUsuario.Equals(Id));
+
+            listaRoles = Db.Roles.OrderBy(x => x.Nombre).ToList();
+
+            foreach (var f in DataUser.UsuarioRoles)
+            {
+                if (f.IDRolNavigation.Nombre != null)
+                {
+                    roles.Add(f.IDRol);
+                }
+            }
+        }
+
+        base.OnInitialized();
+    }
+
+    private void Modificar()
+    {
+        DataUser.ModifiedBy = UserID;
+        DataUser.ModifiedOn = DateTime.Now;
+        Db.Usuario.Update(DataUser);
+
+        if (DataPass.Pass != null)
+        {
+            DataPass.ModifiedBy = UserID;
+            DataPass.ModifiedOn = DateTime.Now;
+            Db.UsuarioPass.Update(DataPass);
+            Db.SaveChanges();
+        }
+        else
+        {
+            DataPass.Pass = ps.HashPassword(DataPass.Pass);
+            DataPass.ModifiedBy = UserID;
+            DataPass.ModifiedOn = DateTime.Now;
+            Db.UsuarioPass.Update(DataPass);
+            Db.SaveChanges();
+        }
+
+
+        Db.UsuarioRoles.RemoveRange(DataUser.UsuarioRoles);
+        Db.SaveChanges();
+
+        foreach (var r in roles)
+        {
+
+            Db.UsuarioRoles.Add(new UsuarioRoles()
+                {
+                    IDUsuario = Id,
+                    IDRol = r,
+                    CreatedOn = DateTime.Now,
+                    CreatedBy = UserID,
+                    ModifiedBy = UserID,
+                    ModifiedOn = DateTime.Now
+
+                });
+            Db.SaveChanges();
+
+        }
+
+        NavManager.NavigateTo("/Administracion/Usuario/Lista");
+
+    }
+
+
+    private void Role(Guid id)
+    {
+
+        if (roles.Contains(id))
+        {
+            roles.Remove(id);
+        }
+        else
+        {
+            roles.Add(id);
+        }
+
+
+        StateHasChanged();
+    }
+}
+

@@ -1,0 +1,159 @@
+﻿@page "/Administracion/AreaClase/Crear"
+@using AcaEspacial.Data
+@using AcaEspacial.Models
+@using AcaEspacial.Models.Custom.Administracion
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims
+@using Microsoft.Extensions.Logging
+@inject AcademiaContext Db
+@inject IHttpContextAccessor httpContextAccessor
+@inject NavigationManager NavManager
+@attribute [Authorize(Roles ="Administrador")]
+
+@if (hide == true)
+{
+    <div class="notification is-danger">
+        @Error
+    </div>
+}
+
+@if (hideError == true)
+{
+    <div class="notification is-success">
+        @Error
+    </div>
+}
+
+<EditForm Model="@DataArea" OnValidSubmit="@Ingresar">
+    <DataAnnotationsValidator />
+    <div class="field-body">
+        <div class="field">
+            <label class="label">Nombre de la clase</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataArea.Nombre />
+                <ValidationMessage For="@(()=>DataArea.Nombre)" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Turno</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataArea.Turno />
+                <ValidationMessage For="@(()=>DataArea.Turno)" />
+            </div>
+        </div>
+        <div class="field">
+            <label class="label">Código Clase</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataArea.CodigoClase />
+                <ValidationMessage For="@(()=>DataArea.CodigoClase)" />
+            </div>
+        </div>
+
+    </div>
+    <div class="field">
+        <label class="label">Academias</label>
+        <div class="control">
+            <div class="field">
+                @foreach (var ListAca in listaAcademia)
+                {
+                    <input id="@ListAca.Nombre" @onchange="@((ChangeEventArgs __e)=>AreaAca(@ListAca.IDAcademia))" type="checkbox" name="@ListAca.Nombre" class="switch">
+                    <label for="@ListAca.Nombre">@ListAca.Nombre</label>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="control" style="margin-top: 1%">
+        <button class="button is-primary" type="submit">Crear</button>
+    </div>
+</EditForm>
+
+
+@code {
+    private Guid UserID = new();
+
+    private List<Academias> listaAcademia = new List<Academias>();
+
+    private CrearArea DataArea = new();
+
+    private string Error = null;
+
+    private bool hide = false;
+
+    private bool hideError = false;
+
+    public List<Guid> academias = new();
+
+    protected override void OnInitialized()
+    {
+        if (httpContextAccessor.HttpContext != null)
+        {
+            UserID = Guid.Parse(httpContextAccessor.HttpContext.User.FindFirstValue(claimType: "IdUsuario"));
+            listaAcademia = Db.Academias.OrderBy(x => x.Nombre).ToList();
+        }
+        base.OnInitialized();
+    }
+
+
+    private void Ingresar()
+    {
+        var usd = Db.AreaClase.FirstOrDefault(x => x.Nombre.ToLower().Equals(DataArea.Nombre.ToLower())
+        || x.CodigoClase.ToLower().Equals(DataArea.CodigoClase.ToLower()));
+
+        if (usd == null)
+        {
+
+            Guid _NewAreaID = Guid.NewGuid();
+
+            Db.AreaClase.Add(new AreaClase()
+                {
+                    IDArea = _NewAreaID,
+                    Nombre = DataArea.Nombre,
+                    Turno = DataArea.Turno,
+                    CodigoClase = DataArea.CodigoClase,
+                    CreatedOn = DateTime.Now,
+                    CreatedBy = UserID,
+
+                });
+            Db.SaveChanges();
+
+            foreach (var r in academias)
+            {
+                Db.AcademiaArea.Add(new AcademiaArea()
+                    {
+                        IDArea = _NewAreaID,
+                        IDAcademia = r,
+                        CreatedOn = DateTime.Now,
+                        CreatedBy = UserID
+
+                    });
+                Db.SaveChanges();
+            }
+
+
+            Error = "Usuario creado Exitosamente";
+            hideError = true;
+            NavManager.NavigateTo("/Administracion/Usuario/Crear");
+        }
+        else
+        {
+            Error = "El usuario ya se encuentra registrado";
+            hide = true;
+        }
+    }
+
+    private void AreaAca(Guid id)
+    {
+        if (academias.Contains(id))
+        {
+            academias.Remove(id);
+        }
+        else
+        {
+            academias.Add(id);
+        }
+
+        StateHasChanged();
+    }
+
+}

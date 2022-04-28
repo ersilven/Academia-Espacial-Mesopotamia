@@ -1,0 +1,136 @@
+is_global = true
+build_property.TargetFramework = net6.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = AcaEspacial
+build_property.RootNamespace = AcaEspacial
+build_property.ProjectDir = C:\Users\esilvera\source\repos\AcaEspacial\AcaEspacial\
+build_property.RazorLangVersion = 6.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\esilvera\source\repos\AcaEspacial\AcaEspacial
+build_property._RazorSourceGeneratorDebug = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Administracion/Academia/Crear.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5pc3RyYWNpb25cQWNhZGVtaWFcQ3JlYXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Administracion/Academia/Editar.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5pc3RyYWNpb25cQWNhZGVtaWFcRWRpdGFyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Administracion/Academia/Lista.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5pc3RyYWNpb25cQWNhZGVtaWFcTGlzdGEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Administracion/Alumno/Editar.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5pc3RyYWNpb25cQWx1bW5vXEVkaXRhci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Administracion/Alumno/Lista.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5pc3RyYWNpb25cQWx1bW5vXExpc3RhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Administracion/AreaClase/Crear.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5pc3RyYWNpb25cQXJlYUNsYXNlXENyZWFyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Administracion/AreaClase/Lista.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5pc3RyYWNpb25cQXJlYUNsYXNlXExpc3RhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Administracion/Profesor/Editar.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5pc3RyYWNpb25cUHJvZmVzb3JcRWRpdGFyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Administracion/Profesor/Lista.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5pc3RyYWNpb25cUHJvZmVzb3JcTGlzdGEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Administracion/Usuario/Crear.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5pc3RyYWNpb25cVXN1YXJpb1xDcmVhci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Administracion/Usuario/Editar.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5pc3RyYWNpb25cVXN1YXJpb1xFZGl0YXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Administracion/Usuario/Lista.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcQWRtaW5pc3RyYWNpb25cVXN1YXJpb1xMaXN0YS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Estudiante/Academia/Lista.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcRXN0dWRpYW50ZVxBY2FkZW1pYVxMaXN0YS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Estudiante/AreaClase/Lista.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcRXN0dWRpYW50ZVxBcmVhQ2xhc2VcTGlzdGEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/IniciarSesion.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSW5pY2lhclNlc2lvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Profesor/Academia/Lista.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcUHJvZmVzb3JcQWNhZGVtaWFcTGlzdGEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Profesor/AreaClase/Lista.razor]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcUHJvZmVzb3JcQXJlYUNsYXNlXExpc3RhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Shared/Footer.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXEZvb3Rlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Shared/LoadingScreen.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXExvYWRpbmdTY3JlZW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Shared/RutaDesconocida.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFJ1dGFEZXNjb25vY2lkYS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Sesion/Pages/LogIn.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcU2VzaW9uXFBhZ2VzXExvZ0luLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Areas/Sesion/Pages/LogOut.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXNcU2VzaW9uXFBhZ2VzXExvZ091dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/esilvera/source/repos/AcaEspacial/AcaEspacial/Pages/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 

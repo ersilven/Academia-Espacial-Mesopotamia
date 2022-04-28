@@ -1,0 +1,161 @@
+﻿@page "/Administracion/Academia/Editar/{Id:guid}"
+@using AcaEspacial.Data
+@using AcaEspacial.Models
+@using AcaEspacial.Models.Administracion.Custom
+@using AcaEspacial.Models.Custom
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims
+@using Microsoft.Extensions.Logging
+@inject AcademiaContext Db
+@inject IHttpContextAccessor httpContextAccessor
+@inject NavigationManager NavManager
+@attribute [Authorize(Roles ="Administrador")]
+
+
+<EditForm Model="@DataAcademia" OnValidSubmit="@Modificar">
+    <DataAnnotationsValidator />
+    <div class="field-body">
+        <div class="field">
+            <label class="label">Nombre</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataAcademia.Nombre />
+                <ValidationMessage For="@(()=>DataAcademia.Nombre)" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Correo</label>
+            <div class="control">
+                <input class="input" type="email" @bind-value=DataAcademia.Correo />
+                <ValidationMessage For="@(()=>DataAcademia.Correo)" />
+            </div>
+        </div>
+        <div class="field">
+            <label class="label">Numero de Telefono</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataAcademia.NumeroTlfono />
+                <ValidationMessage For="@(()=>DataAcademia.NumeroTlfono)" />
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Código Academia</label>
+            <div class="control">
+                <input class="input" type="text" @bind-value=DataAcademia.CodigoAcademia />
+                <ValidationMessage For="@(()=>DataAcademia.CodigoAcademia)" />
+            </div>
+        </div>
+        
+    </div>
+    <div class="field">
+        <label class="label">Areas</label>
+        <div class="control">
+            <div class="field">
+
+                @foreach (var lr in listaArea)
+                {
+                    var r = DataAcademia.AcademiaArea.FirstOrDefault(x => x.IDArea.Equals(lr.IDArea));
+                    if (r != null)
+                    {
+                        <input id="@lr.Nombre" @onchange="@((ChangeEventArgs __e)=>AreaID(@lr.IDArea))" type="checkbox" name="@lr.Nombre" class="switch" checked="checked">
+                        <label for="@lr.Nombre">@lr.Nombre</label>
+
+                    }
+                    else
+                    {
+                        <input id="@lr.Nombre" @onchange="@((ChangeEventArgs __e)=>AreaID(@lr.IDArea))" type="checkbox" name="@lr.Nombre" class="switch">
+                        <label for="@lr.Nombre">@lr.Nombre</label>
+                    }
+
+                }
+            </div>
+
+        </div>
+    </div>
+    <div class="control" style="margin-top: 1%">
+        <button class="button is-primary" type="submit">Editar</button>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private Guid UserID = new();
+
+    private List<AreaClase> listaArea = new List<AreaClase>();
+
+    private List<Guid> areas = new();
+
+    private Academias DataAcademia = new();
+
+
+    protected override void OnInitialized()
+    {
+        if (httpContextAccessor.HttpContext != null)
+        {
+            UserID = Guid.Parse(httpContextAccessor.HttpContext.User.FindFirstValue(claimType: "IdUsuario"));
+            DataAcademia = Db.Academias.Include(x => x.AcademiaArea).ThenInclude(x => x.IDAreaNavigation)
+           .FirstOrDefault(x => x.IDAcademia.Equals(Id)); 
+
+            listaArea = Db.AreaClase.OrderBy(x => x.Nombre).ToList();
+
+            foreach (var f in DataAcademia.AcademiaArea)
+            {
+                if (f.IDAreaNavigation.Nombre != null)
+                {
+                    areas.Add(f.IDArea);
+                }
+            }
+        }
+
+        base.OnInitialized();
+    }
+
+    private void Modificar()
+    {
+        DataAcademia.ModifiedBy = UserID;
+        DataAcademia.ModifiedOn = DateTime.Now;
+        Db.Academias.Update(DataAcademia);
+        
+        Db.AcademiaArea.RemoveRange(DataAcademia.AcademiaArea);
+        Db.SaveChanges();
+
+        foreach (var r in areas)
+        {
+
+            Db.AcademiaArea.Add(new AcademiaArea()
+                {
+                    IDAcademia = Id,
+                    IDArea = r,
+                    CreatedOn = DateTime.Now,
+                    CreatedBy = UserID,
+                    ModifiedBy = UserID,
+                    ModifiedOn = DateTime.Now
+
+                });
+            Db.SaveChanges();
+
+        }
+
+        NavManager.NavigateTo("/Administracion/Academia/Lista");
+
+    }
+
+
+    private void AreaID(Guid id)
+    {
+
+        if (areas.Contains(id))
+        {
+            areas.Remove(id);
+        }
+        else
+        {
+            areas.Add(id);
+        }
+
+        StateHasChanged();
+    }
+}
+
