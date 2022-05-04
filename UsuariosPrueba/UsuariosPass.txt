@@ -1,4 +1,4 @@
-Usuario		Contraseña
-esilvera	prueba123
-rootMaster	master123
-george		bloomcker123
+Usuario		Contraseña  Rol
+esilvera	prueba123   Alumno
+rootMaster	master123 Administrador
+george		bloomcker123  Profesor-Administrador
