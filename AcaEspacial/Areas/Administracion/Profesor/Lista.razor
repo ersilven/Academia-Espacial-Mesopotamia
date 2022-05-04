@@ -1,4 +1,4 @@
-﻿@page "/Administracion/Maestro/Lista"
+@page "/Administracion/Maestro/Lista"
 @using AcaEspacial.Models
 @using AcaEspacial.Data
 @using Microsoft.AspNetCore.Mvc
@@ -7,7 +7,7 @@
 @inject IHttpContextAccessor httpContextAccessor
 @using System.Security.Claims
 @inject NavigationManager NavigationManager
-@attribute [Authorize(Roles ="Administrador")]
+@attribute [Authorize(Roles = "Administrador")]
 
 <div class="row">
     <div class="col-6 text-right">
@@ -55,18 +55,6 @@
                                     <a class="dropdown-item" @onclick=@(e=> Editar(Usuario.IDUsuario))>
                                         Editar
                                     </a>
-                                    @foreach (var p in Usuario.IDUsuarioNavigation.UsuarioEstatus)
-                                    {
-                                        if (p.IDEstatusNavigation.Codigo == 1000)
-                                        {
-                                            <a class="dropdown-item" @onclick=@(e=> ModificarEstatus(Usuario.IDUsuario))>
-                                                Desactivar
-                                            </a>
-                                            <a class="dropdown-item" @onclick=@(e=> ModificarEstatus(Usuario.IDUsuario))>
-                                                Activar
-                                            </a>
-                                        }
-                                    }
                                 </div>
                             </div>
                         </div>
@@ -87,18 +75,6 @@
                                     <a class="dropdown-item" @onclick=@(e=> Editar(Usuario.IDUsuario))>
                                         Editar
                                     </a>
-                                    @foreach (var p in Usuario.IDUsuarioNavigation.UsuarioEstatus)
-                                    {
-                                        if (p.IDEstatusNavigation.Codigo == 1000)
-                                        {
-                                            <a class="dropdown-item" @onclick=@(e=> ModificarEstatus(Usuario.IDUsuario))>
-                                                Desactivar
-                                            </a>
-                                            <a class="dropdown-item" @onclick=@(e=> ModificarEstatus(Usuario.IDUsuario))>
-                                                Activar
-                                            </a>
-                                        }
-                                    }
                                 </div>
                             </div>
                         </div>
@@ -125,33 +101,13 @@
         {
             UserID = Guid.Parse(httpContextAccessor.HttpContext.User.FindFirstValue(claimType: "IdUsuario"));
 
-            ListUsuarioRol = Db.UsuarioRoles.Include(x => x.IDUsuarioNavigation).ThenInclude(x=> x.MaestroAcademia).ThenInclude(x=> x.IDAcademiaNavigation) 
-            .Include(x => x.IDUsuarioNavigation).ThenInclude(x=> x.MaestroArea).ThenInclude(x=> x.IDAreaNavigation)
+            ListUsuarioRol = Db.UsuarioRoles.Include(x => x.IDUsuarioNavigation).ThenInclude(x => x.MaestroAcademia).ThenInclude(x => x.IDAcademiaNavigation)
+            .Include(x => x.IDUsuarioNavigation).ThenInclude(x => x.MaestroArea).ThenInclude(x => x.IDAreaNavigation)
            .Include(x => x.IDRolNavigation)
            .Where(x => x.IDRolNavigation.Nombre.Equals("Profesor")).ToList();
         }
 
         base.OnInitialized();
-    }
-
-    private void ModificarEstatus(Guid Id)
-    {
-        var usd = Db.UsuarioEstatus.Include(x => x.IDEstatusNavigation).FirstOrDefault(x => x.IDUsuario.Equals(Id));
-        if (usd.IDEstatusNavigation.Codigo.Equals(1000))
-        {
-            usd.IDEstatus = Db.Estatus.FirstOrDefault(x => x.Codigo.Equals(2000)).IDEstatus;
-        }
-        else
-        {
-            usd.IDEstatus = Db.Estatus.FirstOrDefault(x => x.Codigo.Equals(1000)).IDEstatus;
-        }
-
-        usd.ModifiedBy = UserID;
-        usd.ModifiedOn = DateTime.Now;
-        Db.UsuarioEstatus.Update(usd);
-        Db.SaveChanges();
-
-        StateHasChanged();
     }
 
     private void Editar(Guid ID)
